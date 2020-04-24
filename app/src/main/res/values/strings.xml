@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">Tour Mate</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_profile">Profile</string>
+    <string name="agree_text">I agree to the <b>terms &amp; conditions</b> of Tour Mate</string>
+    <string name="login_hint_text">Tap Next to verify your account with your phone number. You don\'t need to manually enter verification code if the number install in this phone.</string>
+    <string name="mobile_number_hint">01xxxxxxxxx</string>
+    <string name="enter_mobile_number_hint">Enter your mobile number</string>
+    <string name="enter_the_otp_hint">Enter the code that was sent to</string>
+    <string name="title_continue">Continue</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="not_verified_hint">Not verified</string>
+    <string name="member_since_text">Member since:</string>
+    <string name="title_group">Group</string>
+    <string name="title_name">Name</string>
+    <string name="name_hint">Name</string>
+    <string name="title_email">Email</string>
+    <string name="email_hint">Email</string>
+    <string name="title_mobile_number">Mobile Number</string>
+    <string name="not_set_yet_hint">Not set yet</string>
+    <string name="title_gender">Gender</string>
+    <string name="title_update_profile">Update Profile</string>
+    <string name="title_hotel_address">Hotel Address</string>
+    <string name="search_hint">Search by name or number</string>
+    <string name="title_login">Login</string>
+    <string name="title_password">Password</string>
+    <string name="title_register">Register</string>
+    <string name="title_group_name">Group Name</string>
+    <string name="enter_code_hint">Enter Code</string>
+    <string name="hint_for_member_for_other_activities">Please contact with captain for other activities</string>
+    <string name="title_address">Address</string>
+    <string name="new_password">Enter Password</string>
+
 </resources>
