@@ -64,7 +64,7 @@
                             app:boxCornerRadiusTopEnd="5dp"
                             app:boxCornerRadiusTopStart="5dp">
 
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/mobileNumberET"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                             app:boxCornerRadiusTopStart="5dp"
                             app:passwordToggleEnabled="true">
 
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/passwordET"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
