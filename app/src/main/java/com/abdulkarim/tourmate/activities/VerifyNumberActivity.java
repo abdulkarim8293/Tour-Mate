@@ -13,7 +13,7 @@ public class VerifyNumberActivity extends AppCompatActivity {
     private String mobileNumber;
     private String phoneNumberVerificationId;
 
-    private FirebaseAuth firebaseAuth;
+    //private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
