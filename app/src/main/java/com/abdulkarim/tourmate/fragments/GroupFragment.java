@@ -11,16 +11,25 @@ import android.view.ViewGroup;
 
 import com.abdulkarim.tourmate.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class GroupFragment extends Fragment {
 
+    private FragmentGroupBinding binding;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private ApiService retrofitInstance;
+    private GroupMemberAdapter groupMemberAdapter;
+    private ProgressDialog progressDialog;
+
+    private int userId;
+    private String memberType;
+    private int groupId;
+
+    private List<GroupMember> memberList;
 
     public GroupFragment() {
-        // Required empty public constructor
-    }
 
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
