@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.abdulkarim.tourmate.R;
+import com.abdulkarim.tourmate.activities.AddNewMemberActivity;
 import com.abdulkarim.tourmate.adapters.GroupMemberAdapter;
 import com.abdulkarim.tourmate.databinding.FragmentGroupBinding;
 import com.abdulkarim.tourmate.helper.CustomProgressDialog;
