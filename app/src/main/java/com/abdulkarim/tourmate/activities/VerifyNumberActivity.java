@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,7 +32,7 @@ public class VerifyNumberActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_verify_number);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_verify_number);
 
         init();
 
@@ -96,12 +97,11 @@ public class VerifyNumberActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onCodeSent(String verificationId,
-                               PhoneAuthProvider.ForceResendingToken token) {
+        public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token) {
 
             phoneNumberVerificationId = verificationId;
-
         }
+
     };
 
     private void verifyPhoneCode(String code) {
@@ -111,9 +111,11 @@ public class VerifyNumberActivity extends AppCompatActivity {
 
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(phoneNumberVerificationId, code);
         signInWithPhoneAuthCredential(credential);
+
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+
         firebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override

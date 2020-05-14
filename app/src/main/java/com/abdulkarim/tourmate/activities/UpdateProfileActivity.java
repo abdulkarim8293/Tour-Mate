@@ -194,7 +194,6 @@ public class UpdateProfileActivity extends AppCompatActivity implements SelectIm
                         break;
                     }
                 }
-
             }
         });
 
@@ -208,6 +207,7 @@ public class UpdateProfileActivity extends AppCompatActivity implements SelectIm
     }
 
     private void getGroupList() {
+
         Call<List<Group>> call = retrofitInstance.getGroups();
 
         call.enqueue(new Callback<List<Group>>() {
