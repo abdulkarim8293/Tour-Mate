@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/custom_marker_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:elevation="10dp"
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp">
+
+        <RelativeLayout
+            android:layout_width="45dp"
+            android:background="@drawable/marker_pin"
+            android:id="@+id/imageBackGroundL"
+            android:layout_height="45dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/userProfileImageCIV"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/my_profile_image">
+
+            </de.hdodenhof.circleimageview.CircleImageView>
+        </RelativeLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Karim"
+            android:maxLines="1"
+            android:id="@+id/nameTV"
+            android:shadowColor="#FFFFFF"
+            android:shadowDx="-3"
+            android:shadowDy="-3"
+            android:shadowRadius="1"
+            android:textSize="16sp"
+            android:layout_marginRight="3dp"
+            android:maxWidth="70dp"
+            android:textColor="#77869F"
+            android:layout_toRightOf="@+id/imageBackGroundL"
+            android:layout_marginLeft="-5dp"/>
+    </RelativeLayout>
+
+</LinearLayout>
