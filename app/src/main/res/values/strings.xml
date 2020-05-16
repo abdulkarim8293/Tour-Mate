@@ -10,6 +10,8 @@
     <string name="enter_the_otp_hint">Enter the code that was sent to</string>
     <string name="title_continue">Continue</string>
 
+    <string name="MAP_API_KEY">AIzaSyCeRXz1OGPi8L_7h3bmxZxIjY_6KGIGyds</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="not_verified_hint">Not verified</string>
