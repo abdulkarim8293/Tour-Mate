@@ -550,6 +550,34 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Search
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        locationPermissionsGranted = false;
+
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            locationPermissionsGranted = false;
+                            return;
+                        }
+                    }
+                    locationPermissionsGranted = true;
+                    //initialize our map
+                    initializeMap();
+                }
+            }
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         getActivity().getMenuInflater().inflate(R.menu.search_menu, menu);
