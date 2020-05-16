@@ -50,6 +50,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <service android:name=".service.LocationService"
+            android:stopWithTask="true"/>
+
     </application>
 
 </manifest>

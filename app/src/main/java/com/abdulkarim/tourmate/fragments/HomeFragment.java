@@ -2,9 +2,12 @@ package com.abdulkarim.tourmate.fragments;
 
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.location.Location;
@@ -14,13 +17,19 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -29,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.abdulkarim.tourmate.R;
+import com.abdulkarim.tourmate.bottom_sheet.UserInfoBottomSheet;
 import com.abdulkarim.tourmate.databinding.FragmentHomeBinding;
 import com.abdulkarim.tourmate.helper.CustomProgressDialog;
 import com.abdulkarim.tourmate.helper.SharedPref;
@@ -38,16 +48,23 @@ import com.abdulkarim.tourmate.model.ResponseBody;
 import com.abdulkarim.tourmate.model.User;
 import com.abdulkarim.tourmate.retrofit.ApiService;
 import com.abdulkarim.tourmate.retrofit.RetrofitInstance;
+import com.abdulkarim.tourmate.service.LocationService;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +81,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback, SearchView.OnQueryTextListener{
@@ -377,7 +395,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Search
             TextView nameTV = marker.findViewById(R.id.nameTV);
             if (photo != null && !photo.equals("")) {
                 Glide.with(getActivity().getApplicationContext()).applyDefaultRequestOptions(new RequestOptions()
-                        .placeholder(R.drawable.person_image)).load(RetrofitInstance.BASE_URL + photo).into(markerImage);
+                        .placeholder(R.drawable.my_profile_image)).load(RetrofitInstance.BASE_URL + photo).into(markerImage);
 
             }
             nameTV.setText(name);
@@ -462,6 +480,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Search
 
     }
 
+    private void initializeMap() {
+        googleMapOptions = new GoogleMapOptions();
+        SupportMapFragment supportMapFragment = SupportMapFragment.newInstance(googleMapOptions);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.mapViewFrameLayout, supportMapFragment);
+        fragmentTransaction.commitAllowingStateLoss();
+        supportMapFragment.getMapAsync(this);
+    }
+
     private void getDeviceLocation() {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -491,8 +517,80 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Search
         }
     }
 
+    private void startLocationService() {
+        if (!isLocationServiceRunning()) {
+            Intent serviceIntent = new Intent(getActivity(), LocationService.class);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                getActivity().startForegroundService(serviceIntent);
+            } else {
+                getActivity().startService(serviceIntent);
+            }
+        }
+    }
+
+    private boolean isLocationServiceRunning() {
+        ActivityManager manager = (ActivityManager) getActivity().getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ("com.codingwithmitch.googledirectionstest.services.LocationService".equals(service.service.getClassName())) {
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void updateLocationToDB(Location location) {
+        DatabaseReference userDB = firebaseDatabase.getReference().child("users")
+                .child(String.valueOf(sharedPreferences.getInt(SharedPref.USER_ID, 0)));
+        Map<String, Object> locationMap = new HashMap<>();
+        locationMap.put("latitude", location.getLatitude());
+        locationMap.put("longitude", location.getLongitude());
+        userDB.updateChildren(locationMap);
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        getActivity().getMenuInflater().inflate(R.menu.search_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setQueryHint("Type here..");
+        View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
+        v.setBackgroundColor(getActivity().getResources().getColor(R.color.white));
+        ImageView searchClose = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        searchClose.setColorFilter(ContextCompat.getColor(getActivity(), R.color.black), android.graphics.PorterDuff.Mode.MULTIPLY);
+
+        searchView.setOnQueryTextListener(this);
+
+    }
+
     @Override
     public boolean onQueryTextSubmit(String query) {
+
+        query = query.toLowerCase();
+
+        boolean isMatch = false;
+
+        if (memberLocationList != null && memberLocationList.size() > 0) {
+            for (MemberLocation memberLocation : memberLocationList) {
+                if (memberLocation.getName().toLowerCase().contains(query)
+                        || memberLocation.getPhone().toLowerCase().contains(query)) {
+                    animateCamera(new LatLng(memberLocation.getLatitude(), memberLocation.getLongitude()), 21);
+                    isMatch = true;
+                    break;
+                }
+            }
+
+            if (isMatch == false) {
+                Toast.makeText(getActivity(), "No user found by " + query, Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getActivity(), "No user found by " + query, Toast.LENGTH_SHORT).show();
+        }
+
+
         return false;
     }
 
@@ -504,5 +602,74 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Search
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+        map = googleMap;
+
+        changeMapStyle(map);
+
+        if (locationPermissionsGranted) {
+
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
+            getDeviceLocation();
+
+            map.setMyLocationEnabled(true);
+            map.getUiSettings().setMapToolbarEnabled(false);
+            map.getUiSettings().setMyLocationButtonEnabled(false);
+
+
+        }
+
+        map.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+
+                if (visibleMyLocationBtn == true) {
+                    //binding.myLocationFAB.show();
+                }
+
+            }
+        });
+
+        map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                visibleMyLocationBtn = true;
+            }
+        });
+
+
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                openBottomSheet(marker.getSnippet());
+                return true;
+            }
+        });
+
+    }
+
+
+    private void openBottomSheet(String selectedUserID) {
+        if (selectedUserID != null && !selectedUserID.equals("")) {
+            Bundle bundle = new Bundle();
+            bundle.putString("selectedUserID", selectedUserID);
+            UserInfoBottomSheet userInfoBottomSheet = new UserInfoBottomSheet();
+            userInfoBottomSheet.setArguments(bundle);
+            userInfoBottomSheet.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "UserInfoBottomSheet");
+        }
+    }
+
+
+    private void changeMapStyle(GoogleMap map) {
+        try {
+            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(
+                    getActivity(), R.raw.map_style));
+        } catch (Resources.NotFoundException e) {
+
+        }
     }
 }
